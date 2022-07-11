@@ -61,7 +61,7 @@ void output_error(int error_code)
 	log_file << error << endl;
 }
 
-bool assign_value(bool& has_set, int& variable, string value, int error_code)
+bool assign_value(bool &has_set, int &variable, string value, int error_code)
 {
 	try
 	{
@@ -92,7 +92,7 @@ bool assign_value(bool& has_set, int& variable, string value, int error_code)
 	}
 }
 
-bool process_command_line(int argc, char* argv[])
+bool process_command_line(int argc, char *argv[])
 {
 	if (argc > 7)
 	{
@@ -142,7 +142,7 @@ string conver_to_string(time_t time)
 	return oss.str().insert(4, ":").insert(2, ":");
 }
 
-int main(int argc, char* argv[])
+int main(int argc, char *argv[])
 {
 	log_file.open(LOG_FILE_NAME);
 	if (process_command_line(argc, argv))
@@ -160,7 +160,7 @@ int main(int argc, char* argv[])
 				for (int j = 0; j < num_sensors; j++)
 				{
 					new_file << endl
-						<< j + 1 << "," << conver_to_string(now + i) << "," << rand() % 15001 * 2.0 / 10;
+							 << j + 1 << "," << conver_to_string(now + i) << "," << rand() % 15001 * 2.0 / 10;
 				}
 			}
 			new_file.close();
