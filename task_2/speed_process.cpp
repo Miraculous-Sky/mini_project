@@ -118,6 +118,7 @@ int parse_record(string line, record &result)
 				return MISSING_DATA;
 			}
 		}
+
 		result.id = stoi(elements[0]);
 		result.speed = stof(elements[2]);
 
