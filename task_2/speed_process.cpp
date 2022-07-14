@@ -8,6 +8,7 @@
 #include <cstdlib>
 #include <cstring>
 #include <vector>
+#include <regex>
 #include <algorithm>
 
 using namespace std;
@@ -104,32 +105,34 @@ int parse_record(string line, record &result)
 	{
 		return MISSING_DATA;
 	}
-	string elements[3];
 
+	regex full_data("^\\d+,\\d{2}:\\d{2}:\\d{2},[+-]?\\d+(\\.\\d+)?$");
+	regex missing_data("^\\d*,(\\d{2}:\\d{2}:\\d{2})?,([+-]?\\d+(\\.\\d+)?)?$");
+	if (!regex_match(line, full_data))
+	{
+		if (regex_match(line, missing_data))
+		{
+			return MISSING_DATA;
+		}
+		return INVALID_FORMAT;
+	}
+
+	string element;
 	istringstream iss(line);
 	iss.exceptions(ifstream::failbit);
 	try
 	{
-		for (int i = 0; i < 3; i++)
-		{
-			getline(iss, elements[i], ',');
-			if (elements[i].length() == 0)
-			{
-				return MISSING_DATA;
-			}
-		}
+		getline(iss, element, ',');
+		result.id = stoi(element);
+		getline(iss, element, ':');
+		result.hour = stoi(element);
+		getline(iss, element, ':');
+		result.minute = stoi(element);
+		getline(iss, element, ',');
+		result.second = stoi(element);
+		getline(iss, element);
+		result.speed = stof(element);
 
-		result.id = stoi(elements[0]);
-		result.speed = stof(elements[2]);
-
-		istringstream iss(elements[1]);
-		for (int i = 0; i < 3; i++)
-		{
-			getline(iss, elements[i], ':');
-		}
-		result.hour = stoi(elements[0]);
-		result.minute = stoi(elements[1]);
-		result.second = stoi(elements[2]);
 		if (result.id < 0 || result.speed < 0 || result.speed > 3000 || result.hour > 23 || result.hour < 0 || result.minute > 59 || result.minute < 0 || result.second > 59 || result.second < 0)
 		{
 			return INVALID_FORMAT;
@@ -156,7 +159,7 @@ bool load_data_and_filter_out_outlier()
 	{
 		if (parse_record(line, new_record) == INVALID_FORMAT)
 		{
-			output_error(INVALID_FORMAT);
+			output_error(INVALID_FORMAT, line_num);
 			return false;
 		}
 		else if (parse_record(line, new_record) == MISSING_DATA)
